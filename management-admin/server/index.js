@@ -7,7 +7,7 @@ const app = express();
 //allow cross-domain   (because the backend file is 3001 but the frontend files is 8080 in this project)
 app.use(require('cors')());
 // let 'express' to iditify the json which is submitted by backend
-app.use(express.json())
+app.use(express.json());
 //connect mongodb      (those parameters are necessary)
 const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost:27017/management-admin',{
@@ -25,14 +25,41 @@ const Article = mongoose.model('Article',{
 
 
 //creat/submit a new article
-app.post('/api/article',async (req,res)=>{
+app.post('/api/articles',async (req,res)=>{
     const article = await Article.create(req.body)
     res.send(article) 
 })
+
+//get the list of articles
+app.get('/api/articles',async (req,res)=>{
+    const list  = await Article.find()
+    res.send(list)
+})
+
+//delete article
+app.delete('/api/articles/:id',async (req,res)=>{
+    await Article.findByIdAndDelete(req.params.id)
+    res.send({
+        status:true
+    })
+})
+//return articles'detail
+app.get('/api/articles/:id',async (req,res)=>{
+    const detail = await Article.findById(req.params.id)
+    res.send(detail)
+})
+
+//edit articles (rest norm)
+app.put('/api/articles/:id',async (req,res)=>{
+    const update = await Article.findByIdAndUpdate(req.params.id,req.body)
+    res.send(update) 
+})
+
 //'get' test
 app.get('/',async (req,res)=>{
     res.send('index')
 })
+
 
 //listen on port3001
 app.listen('3001',()=>{
